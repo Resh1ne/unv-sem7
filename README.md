@@ -1,1 +1,2 @@
-# unv-sem7
+# Практическое занятие 1
+micro.com: https://miro.com/welcomeonboard/U091MHh2aWt2R0tLOS9TekVJcUw2a2FXVkg1b2IyTVYvaExiKzFrcTJYUkhkdGNQZXRldTNGWnhnSFRkR1lLalJ4SThPZTB0ZnYzaFFvRTU0bHNPM3p1RTV4ZmMyYndDQjZQQjVjZGc0MGxQWDU4Q3lqOVlzL3NDVVdyVzNjeEJNakdSWkpBejJWRjJhRnhhb1UwcS9BPT0hdjE=?share_link_id=70411083283
