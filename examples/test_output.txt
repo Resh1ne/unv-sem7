@@ -1,0 +1,10 @@
+write("Starting calculation...");
+
+int first_num = 50;
+int second_num = 8;
+int result = first_num - second_num;
+
+write("The result is:");
+write(result);
+
+write("Calculation finished.");
