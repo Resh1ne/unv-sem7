@@ -1,0 +1,106 @@
+func create_gradient() {
+    image img = new_image(256, 256);
+    color c;
+    int i = 0;
+    int j = 0;
+
+    for i = 0 to 255 {
+        for j = 0 to 255 {
+            c = new_color(i, j, 128);
+            img[i, j] = c;
+        }
+    }
+
+    save(img, "gradient.png");
+    write("Image 'gradient.png' was successfully created and saved.");
+}
+
+create_gradient();
+
+string mode = "grayscale";
+
+func transform_image() {
+    image base_img = load("photo.png");
+    image new_img = new_image(base_img.width, base_img.height);
+    pixel p;
+    color c;
+    int i = 0;
+    int j = 0;
+
+    if (base_img == null) {
+        write("Error: failed to load image.");
+    } ese {
+        switch (mode) {
+            case "grayscale": {
+                write("Applying grayscale filter...");
+                for i = 0 to base_img.width - 1 {
+                    for j = 0 to base_img.height - 1 {
+                        p = base_img[i, j];
+                        int gray = (p.red + p.green + p.blue) / 3
+                        c = new_color(gray, gray, gray);
+                        new_img[i, j] = c;
+                    }
+                }
+                break;
+            }
+            case "invert": {
+                write("Applying color inversion...");
+                for i = 0 to base_img.width - 1 {
+                    for j = 0 to base_img.height - 1 {
+                        p = base_img[i, j];
+                        c = new_color(255 - p.red, 255 - p.green, 255 - p.blue);
+                        new_img[i, j] = c;
+                    }
+                }
+                break;
+
+            default: {
+                write("Unknown mode, copying the image.");
+                new_img = base_img;
+            }
+        }
+        save(new_img, "transformed.png");
+        write("Transformation complete.");
+    }
+}
+
+transform_image();
+
+
+int border_size = 10;
+
+func add_border(image input_img, color border_color) -> image {
+    int width = input_img.width;
+    int height = input_img.height;
+    image bordered_img = new_image(width, height);
+    int i = 0;
+
+    while (i < width) {
+        int j = 0;
+        while (j < height) {
+            if (i < border_size || i >= width - border_size || j < border_size || j >= height - border_size) {
+                bordered_img[i, j] = border_color;
+            } else {
+                bordered_img[i, j] = input_img[i, j];
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return bordered_img;
+}
+
+func main() {
+    image my_image = load("source.png");
+    color frame_color = new_color(255, 0, 0);
+
+    if (my_image != null) {
+        image result_image = add_border(my_image, frame_color);
+        save(result_image, "bordered_image.png");
+        write("Image with a border has been saved.");
+    } else {
+        write("Failed to load the source image.");
+    }
+}
+
+main();
