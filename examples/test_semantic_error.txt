@@ -1,0 +1,10 @@
+func main() {
+    int a = 10;
+    string b = "hello";
+
+    int c = a + b;
+
+    d = 5;
+
+    int a = 20;
+}
