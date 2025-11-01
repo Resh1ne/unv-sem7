@@ -12,7 +12,7 @@ func create_gradient() {
     }
 
     save(img, "gradient.png");
-    write("Изображение 'gradient.png' успешно создано и сохранено.");
+    write("Image 'gradient.png' was successfully created and saved.");
 }
 
 create_gradient();
@@ -28,11 +28,11 @@ func transform_image() {
     int j = 0;
 
     if (base_img == null) {
-        write("Ошибка: не удалось загрузить изображение.");
+        write("Error: failed to load image.");
     } else {
         switch (mode) {
             case "grayscale": {
-                write("Применяется фильтр оттенков серого...");
+                write("Applying grayscale filter...");
                 for i = 0 to base_img.width - 1 {
                     for j = 0 to base_img.height - 1 {
                         p = base_img[i, j];
@@ -44,7 +44,7 @@ func transform_image() {
                 break;
             }
             case "invert": {
-                write("Применяется инверсия цветов...");
+                write("Applying color inversion...");
                 for i = 0 to base_img.width - 1 {
                     for j = 0 to base_img.height - 1 {
                         p = base_img[i, j];
@@ -55,12 +55,12 @@ func transform_image() {
                 break;
             }
             default: {
-                write("Неизвестный режим, копируем изображение.");
+                write("Unknown mode, copying the image.");
                 new_img = base_img;
             }
         }
         save(new_img, "transformed.png");
-        write("Трансформация завершена.");
+        write("Transformation complete.");
     }
 }
 
@@ -77,7 +77,7 @@ func add_border(image input_img, color border_color) -> image {
 
     while (i < width) {
         int j = 0;
-        until (j >= height) {
+        while (j < height) {
             if (i < border_size || i >= width - border_size || j < border_size || j >= height - border_size) {
                 bordered_img[i, j] = border_color;
             } else {
@@ -97,9 +97,9 @@ func main() {
     if (my_image != null) {
         image result_image = add_border(my_image, frame_color);
         save(result_image, "bordered_image.png");
-        write("Изображение с рамкой сохранено.");
+        write("Image with a border has been saved.");
     } else {
-        write("Не удалось загрузить исходное изображение.");
+        write("Failed to load the source image.");
     }
 }
 
