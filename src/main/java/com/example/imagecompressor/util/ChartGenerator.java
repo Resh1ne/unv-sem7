@@ -15,13 +15,11 @@ import java.util.List;
 public class ChartGenerator {
 
     public static void main(String[] args) throws IOException {
-        // Создаем папку для сохранения графиков, если ее нет
         File chartDir = new File("charts");
         if (!chartDir.exists()) {
             chartDir.mkdirs();
         }
 
-        // Генерируем все графики по данным из отчета
         generateIterationsVsCompressionRatioCharts();
         generateIterationsVsMaxErrorChart();
         generateIterationsVsLearningRateChart();
@@ -31,28 +29,24 @@ public class ChartGenerator {
     }
 
     /**
-     * Создает графики зависимости итераций от коэффициента сжатия (Рис. 3, 4, 5)
+     * Создает графики зависимости итераций от коэффициента сжатия (Рис. 3)
      */
     private static void generateIterationsVsCompressionRatioCharts() throws IOException {
-        // Данные из таблицы на стр. 12
         List<Double> z = List.of(4.5849, 2.8656, 2.2925, 1.5283, 1.1463);
         List<Integer> avgIterations = List.of(170, 139, 126, 109, 84);
 
-        // График среднего количества итераций (Рис. 4)
         XYChart chartAvg = createBaseChart("Зависимость среднего кол-ва итераций от коэф. сжатия",
                 "Коэффициент сжатия", "Кол-во итераций");
         chartAvg.addSeries("Среднее кол-во итераций", z, avgIterations).setMarker(SeriesMarkers.CIRCLE);
 
-        // Сохраняем единственный график
         BitmapEncoder.saveBitmap(chartAvg, "./charts/chart_4_avg_iter_vs_z.png", BitmapEncoder.BitmapFormat.PNG);
         System.out.println("График зависимости среднего кол-ва итераций от коэф. сжатия сохранен.");
     }
 
     /**
-     * Создает график зависимости итераций от максимально допустимой ошибки (Рис. 6)
+     * Создает график зависимости итераций от максимально допустимой ошибки (Рис. 4)
      */
     private static void generateIterationsVsMaxErrorChart() throws IOException {
-        // Данные из таблицы на стр. 13
         List<Double> e = List.of(3000.0, 5000.0, 10000.0, 15000.0, 20000.0);
         List<Integer> iterations = List.of(236, 101, 34, 19, 13);
 
@@ -63,25 +57,23 @@ public class ChartGenerator {
     }
 
     /**
-     * Создает график зависимости итераций от коэффициента обучения (Рис. 7)
+     * Создает график зависимости итераций от коэффициента обучения (Рис. 5)
      */
     private static void generateIterationsVsLearningRateChart() throws IOException {
-        // Данные из таблицы на стр. 11
         List<Double> lr = List.of(0.000025, 0.000035, 0.000045, 0.000055, 0.000065, 0.00008, 0.0001);
         List<Integer> iterations = List.of(365, 282, 211, 172, 151, 127, 85);
 
         XYChart chart = createBaseChart("Зависимость кол-ва итераций от коэф. обучения",
                 "Коэффициент обучения", "Кол-во итераций");
-        chart.getStyler().setXAxisLabelRotation(45); // Поворот подписей для лучшей читаемости
+        chart.getStyler().setXAxisLabelRotation(45);
         chart.addSeries("Итерации", lr, iterations).setMarker(SeriesMarkers.CIRCLE);
         BitmapEncoder.saveBitmap(chart, "./charts/chart_7_iter_vs_lr.png", BitmapEncoder.BitmapFormat.PNG);
     }
 
     /**
-     * Создает график зависимости итераций от макс. Ошибки для разных изображений (Рис. 11)
+     * Создает график зависимости итераций от макс. Ошибки для разных изображений (Рис. 6)
      */
     private static void generateIterationsVsMaxErrorMultiImageChart() throws IOException {
-        // Данные из таблицы на стр. 12
         List<Double> e = List.of(3000.0, 5000.0, 10000.0, 15000.0, 20000.0);
         List<Integer> iterImg1 = List.of(236, 101, 34, 19, 13);
         List<Integer> iterImg2 = List.of(335, 105, 39, 27, 17);

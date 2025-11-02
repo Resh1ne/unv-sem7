@@ -20,7 +20,7 @@ public class ImageCompressor {
         CliArguments cliArgs = CliArguments.parse(args);
 
         try {
-            // 1. Загрузка и обработка изображения
+            // Загрузка и обработка изображения
             System.out.println("Reading input image: " + cliArgs.inputFile.getPath());
             BufferedImage originalImage = ImageIO.read(cliArgs.inputFile);
             ImageUtils.ImageBlocks imageBlocksData = ImageUtils.splitIntoBlocks(
@@ -28,11 +28,10 @@ public class ImageCompressor {
             );
             Matrix blocks = imageBlocksData.blocks();
 
-            // 2. Расчет параметров сети и коэффициента сжатия
+            // Расчет параметров сети и коэффициента сжатия
             int inputSize = blocks.cols; // Размер одного блока (например, 8*8*3 = 192)
             int hiddenSize = (cliArgs.hiddenLayerSize != null) ? cliArgs.hiddenLayerSize : inputSize / 2;
             double compressCoef = getCompressCoef(blocks, inputSize, hiddenSize);
-            // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
 
             System.out.printf("Compress coefficient: %.4f%n", compressCoef);
             if (compressCoef <= 1) {
@@ -41,7 +40,7 @@ public class ImageCompressor {
                 return;
             }
 
-            // 3. Создание и обучение сети
+            // Создание и обучение сети
             NeuralNetwork network = new NeuralNetwork(
                     inputSize,
                     hiddenSize,
@@ -52,7 +51,7 @@ public class ImageCompressor {
             System.out.println("Starting network training...");
             network.train(blocks);
 
-            // 4. Восстановление изображения
+            // Восстановление изображения
             System.out.println("Reconstructing image...");
             Matrix reconstructedBlocks = Matrix.multiply(
                     Matrix.multiply(blocks, network.weights1),
@@ -69,7 +68,7 @@ public class ImageCompressor {
                     imageBlocksData.paddedHeight()
             );
 
-            // 5. Сохранение и отображение результата
+            // Сохранение и отображение результата
             cliArgs.outputFile.getParentFile().mkdirs();
             ImageIO.write(reconstructedImage, "bmp", cliArgs.outputFile);
             System.out.println("Output image saved to: " + cliArgs.outputFile.getPath());

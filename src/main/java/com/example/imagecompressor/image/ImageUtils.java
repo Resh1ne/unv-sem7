@@ -19,26 +19,25 @@ public class ImageUtils {
     public record ImageBlocks(Matrix blocks, int originalWidth, int originalHeight, int paddedWidth, int paddedHeight) {}
 
     public static ImageBlocks splitIntoBlocks(BufferedImage image, int blockWidth, int blockHeight) {
-        // 1. Конвертация в 3-компонентный RGB, если необходимо
+        // Конвертация в 3-компонентный RGB
         if (image.getType() != BufferedImage.TYPE_3BYTE_BGR) {
             BufferedImage convertedImg = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             convertedImg.getGraphics().drawImage(image, 0, 0, null);
             image = convertedImg;
         }
 
-        // 2. Расчет паддинга
+        // Расчет паддинга
         int originalWidth = image.getWidth();
         int originalHeight = image.getHeight();
         Padding padding = computePadding(originalWidth, originalHeight, blockWidth, blockHeight);
         int paddedWidth = originalWidth + padding.width();
         int paddedHeight = originalHeight + padding.height();
 
-        // 3. Создание нового изображения с паддингом
+        // Создание нового изображения с паддингом
         BufferedImage paddedImage = new BufferedImage(paddedWidth, paddedHeight, BufferedImage.TYPE_3BYTE_BGR);
         paddedImage.getGraphics().drawImage(image, 0, 0, null);
-        // Здесь используется простейшее копирование края, для простоты. Отражение (reflect) сложнее.
 
-        // 4. Разделение на блоки и нормализация
+        // Разделение на блоки и нормализация
         List<double[]> blocksList = new ArrayList<>();
         byte[] pixels = ((DataBufferByte) paddedImage.getRaster().getDataBuffer()).getData();
         int channels = 3; // B, G, R
