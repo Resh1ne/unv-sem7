@@ -1,1 +1,1 @@
-# unv-sem7
+# java -jar target/image-compressor-1.0.0.jar input.bmp -o pictures/output_java.bmp
