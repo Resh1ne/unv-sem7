@@ -35,9 +35,9 @@ public class NeuralNetwork {
         Matrix error = Matrix.subtract(output, input);
 
         Matrix w2Update = Matrix.multiply(this.encoded.transpose(), error);
-        this.weights2.subtractInPlace(w2Update, this.learningRate);
-
         Matrix w1Update = Matrix.multiply(input.transpose(), Matrix.multiply(error, this.weights2.transpose()));
+
+        this.weights2.subtractInPlace(w2Update, this.learningRate);
         this.weights1.subtractInPlace(w1Update, this.learningRate);
     }
 
