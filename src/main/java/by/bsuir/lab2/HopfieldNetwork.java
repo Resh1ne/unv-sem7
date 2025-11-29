@@ -25,6 +25,8 @@ public class HopfieldNetwork {
         this.weights.reset();
         int n = this.size;
 
+        System.out.println("--- Начало процесса обучения (Delta Rule) ---");
+
         for (int iter = 0; iter < maxIters; iter++) {
             float maxChange = 0.0f;
 
@@ -56,16 +58,14 @@ public class HopfieldNetwork {
                 }
             }
 
-            // Вывод прогресса обучения (чтобы не спамить, выводим каждые 100 или при завершении)
+            System.out.printf("Обучение: итерация %d, макс. изменение весов = %.12f%n", iter + 1, maxChange);
             if (maxChange < tolerance) {
-                System.out.printf("Обучение сошлось на итерации %d (max_change = %.8f)%n", iter + 1, maxChange);
+                System.out.printf("--- Обучение завершено: сошлось на итерации %d (max_change = %.8f) ---%n", iter + 1, maxChange);
                 return iter + 1;
             }
-
-            if ((iter + 1) % 100 == 0) {
-                System.out.printf("Обучение, итерация %d: max_change = %.13f%n", iter + 1, maxChange);
-            }
         }
+
+        System.out.println("--- Обучение остановлено: превышен лимит итераций ---");
         return maxIters;
     }
 
@@ -74,15 +74,17 @@ public class HopfieldNetwork {
         float[] state = Arrays.copyOf(input, input.length);
         float[] prevState = new float[size];
 
-        System.out.println("--- Начало процесса релаксации ---");
+        System.out.println("\n--- Начало процесса релаксации (Recall) ---");
 
         for (int i = 0; i < maxIters; i++) {
             System.arraycopy(state, 0, prevState, 0, size);
 
+            // Асинхронное обновление (нейрон за нейроном)
             for (int j = 0; j < size; j++) {
                 state[j] = updateNeuron(j, state);
             }
 
+            // Проверка условия остановки и вывод
             if (stopRecalling(i, prevState, state, tolerance)) {
                 System.out.println("--- Релаксация завершена ---");
                 return new RecallResult(state, i + 1);
