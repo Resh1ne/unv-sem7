@@ -1,3 +1,11 @@
+// Индивидуальная лабораторная работа 2 по дисциплине МРЗвИС вариант 13
+// Выполнена студентом группы 221702 БГУИР Потоцким Даниилом Александровичем
+// Входной файл программы сети с Хопфилда с непрерывным состоянием и дискретным временем в асинхронном режиме
+// Последние изменения: 03.11.2025, версия: 1
+//
+// Использованные источники:
+// Формальные модели обработки информации и параллельные модели решения задач. Практикум: учебно-методическое пособие / В. П. Ивашенко. – Минск: БГУИР, 2020.
+//
 package by.bsuir.lab2;
 
 import by.bsuir.lab2.util.ExperimentRunner;
@@ -14,7 +22,6 @@ import java.util.List;
 
 public class Main {
 
-    // Вспомогательный класс для передачи контекста
     static class NetworkSetup {
         HopfieldNetwork network;
         List<float[]> patterns;
@@ -55,7 +62,6 @@ public class Main {
         List<float[]> patterns = ImageUtils.loadPatternsFromDir("letters/");
         if (patterns.isEmpty()) throw new IOException("Не найдено изображений в папке letters/");
 
-        // Обработка включений (дублирование паттернов)
         List<float[]> trainingSet = new ArrayList<>(patterns);
         for (int i = 0; i < config.patternReplications; i++) {
             trainingSet.addAll(patterns);

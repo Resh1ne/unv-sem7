@@ -1,3 +1,11 @@
+// Индивидуальная лабораторная работа 2 по дисциплине МРЗвИС вариант 13
+// Выполнена студентом группы 221702 БГУИР Потоцким Даниилом Александровичем
+// Файл реализации сети Хопфилда
+// Последние изменения: 03.11.2025, версия: 1
+//
+// Использованные источники:
+// Формальные модели обработки информации и параллельные модели решения задач. Практикум: учебно-методическое пособие / В. П. Ивашенко. – Минск: БГУИР, 2020.
+//
 package by.bsuir.lab2;
 
 import java.util.Arrays;
@@ -10,7 +18,6 @@ public class HopfieldNetwork {
     private final DoubleUnaryOperator activation;
     private final int size;
 
-    // Результат работы сети (состояние + кол-во итераций)
         public record RecallResult(float[] state, int iterations) {
     }
 
@@ -20,7 +27,6 @@ public class HopfieldNetwork {
         this.weights = new Matrix(size, size);
     }
 
-    // Обучение методом проекции (Delta rule)
     public int trainProjectiveDelta(List<float[]> patterns, float eta, int maxIters, float tolerance) {
         this.weights.reset();
         int n = this.size;
@@ -31,7 +37,7 @@ public class HopfieldNetwork {
             float maxChange = 0.0f;
 
             for (float[] pat : patterns) {
-                // 1. Вычисляем W * x параллельно
+                // W * x
                 float[] wx = new float[n];
                 IntStream.range(0, n).parallel().forEach(i -> {
                     float sum = 0.0f;
@@ -41,13 +47,13 @@ public class HopfieldNetwork {
                     wx[i] = sum;
                 });
 
-                // 2. Вычисляем ошибку (параллельно)
+                // ошибка
                 float[] error = new float[n];
                 IntStream.range(0, n).parallel().forEach(i -> {
                     error[i] = pat[i] - wx[i];
                 });
 
-                // 3. Обновляем веса
+                // веса
                 for (int i = 0; i < n; i++) {
                     float factor = (eta / n) * error[i];
                     for (int j = 0; j < n; j++) {
@@ -69,7 +75,6 @@ public class HopfieldNetwork {
         return maxIters;
     }
 
-    // Восстановление образа (Recall)
     public RecallResult recall(float[] input, int maxIters, float tolerance) {
         float[] state = Arrays.copyOf(input, input.length);
         float[] prevState = new float[size];
@@ -79,12 +84,10 @@ public class HopfieldNetwork {
         for (int i = 0; i < maxIters; i++) {
             System.arraycopy(state, 0, prevState, 0, size);
 
-            // Асинхронное обновление (нейрон за нейроном)
             for (int j = 0; j < size; j++) {
                 state[j] = updateNeuron(j, state);
             }
 
-            // Проверка условия остановки и вывод
             if (stopRecalling(i, prevState, state, tolerance)) {
                 System.out.println("--- Релаксация завершена ---");
                 return new RecallResult(state, i + 1);
