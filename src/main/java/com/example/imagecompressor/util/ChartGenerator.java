@@ -6,10 +6,13 @@ import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.style.Styler;
+import org.knowm.xchart.style.lines.SeriesLines;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChartGenerator {
@@ -60,13 +63,24 @@ public class ChartGenerator {
      * Создает график зависимости итераций от коэффициента обучения (Рис. 5)
      */
     private static void generateIterationsVsLearningRateChart() throws IOException {
-        List<Double> lr = List.of(0.000025, 0.000035, 0.000045, 0.000055, 0.000065, 0.00008, 0.0001);
-        List<Integer> iterations = List.of(365, 282, 211, 172, 151, 127, 85);
+        List<Double> lr = List.of(0.000025, 0.000035, 0.000045, 0.000055, 0.000065, 0.00008, 0.0001, 0.00012, 0.00014, 0.00016);
+        List<Integer> iterations = List.of(365, 282, 211, 172, 151, 127, 85, 78, 47, 35);
 
         XYChart chart = createBaseChart("Зависимость кол-ва итераций от коэф. обучения",
                 "Коэффициент обучения", "Кол-во итераций");
         chart.getStyler().setXAxisLabelRotation(45);
         chart.addSeries("Итерации", lr, iterations).setMarker(SeriesMarkers.CIRCLE);
+
+        double targetX = 0.00018;
+        List<Double> xLine = java.util.Arrays.asList(targetX, targetX);
+        List<Integer> yLine = java.util.Arrays.asList(0, 400);
+        XYSeries verticalLine = chart.addSeries("Порог", xLine, yLine);
+        verticalLine.setXYSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
+        verticalLine.setMarker(SeriesMarkers.NONE);
+        verticalLine.setLineStyle(org.knowm.xchart.style.lines.SeriesLines.DASH_DASH);
+        verticalLine.setLineColor(java.awt.Color.DARK_GRAY);
+        verticalLine.setShowInLegend(false); // Скрываем из легенды, чтобы не мешала
+
         BitmapEncoder.saveBitmap(chart, "./charts/chart_7_iter_vs_lr.png", BitmapEncoder.BitmapFormat.PNG);
     }
 
