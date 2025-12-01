@@ -2,7 +2,7 @@ package by.bsuir.lab2;
 
 public class AppConfig {
     public String mode = "test-all";
-    public String customImagePath = ""; // Новое поле для пути к файлу
+    public String customImagePath = "";
     public char singleLetter = 'A';
     public int maxIterations = 1_000_000;
     public float learningRate = 0.8f;
