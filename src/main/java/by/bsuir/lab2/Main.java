@@ -1,11 +1,3 @@
-// Индивидуальная лабораторная работа 2 по дисциплине МРЗвИС вариант 13
-// Выполнена студентом группы 221702 БГУИР Потоцким Даниилом Александровичем
-// Входной файл программы сети с Хопфилда с непрерывным состоянием и дискретным временем в асинхронном режиме
-// Последние изменения: 03.11.2025, версия: 1
-//
-// Использованные источники:
-// Формальные модели обработки информации и параллельные модели решения задач. Практикум: учебно-методическое пособие / В. П. Ивашенко. – Минск: БГУИР, 2020.
-//
 package by.bsuir.lab2;
 
 import by.bsuir.lab2.util.ExperimentRunner;
@@ -28,10 +20,7 @@ public class Main {
         int width, height;
 
         public NetworkSetup(HopfieldNetwork n, List<float[]> p, int w, int h) {
-            this.network = n;
-            this.patterns = p;
-            this.width = w;
-            this.height = h;
+            this.network = n; this.patterns = p; this.width = w; this.height = h;
         }
     }
 
@@ -47,11 +36,14 @@ public class Main {
                 case "test-all":
                     runTestAll(config);
                     break;
+                case "custom": // НОВЫЙ РЕЖИМ
+                    runCustomImage(config);
+                    break;
                 case "graphs":
                     ExperimentRunner.runAllPlots();
                     break;
                 default:
-                    System.out.println("Неизвестный режим. Используйте: single, test-all, или graphs");
+                    System.out.println("Неизвестный режим. Доступно: single, test-all, custom, graphs");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,6 +51,7 @@ public class Main {
     }
 
     private static NetworkSetup setupNetwork(AppConfig config) throws IOException {
+        System.out.println("Загрузка обучающей выборки из letters/...");
         List<float[]> patterns = ImageUtils.loadPatternsFromDir("letters/");
         if (patterns.isEmpty()) throw new IOException("Не найдено изображений в папке letters/");
 
@@ -67,11 +60,57 @@ public class Main {
             trainingSet.addAll(patterns);
         }
 
-        HopfieldNetwork network = new HopfieldNetwork(patterns.getFirst().length, Math::tanh);
+        HopfieldNetwork network = new HopfieldNetwork(patterns.get(0).length, Math::tanh);
         network.trainProjectiveDelta(trainingSet, config.learningRate, config.maxIterations, config.trainingTolerance);
 
         Dimension dim = ImageUtils.getLastLoadedDimensions();
         return new NetworkSetup(network, patterns, dim.width, dim.height);
+    }
+
+    // --- НОВЫЙ МЕТОД ---
+    private static void runCustomImage(AppConfig config) throws IOException {
+        if (config.customImagePath.isEmpty()) {
+            System.err.println("Ошибка: Укажите путь к файлу через флаг -f (например: -f my_image.png)");
+            return;
+        }
+
+        File imgFile = new File(config.customImagePath);
+        if (!imgFile.exists()) {
+            System.err.println("Ошибка: Файл не найден -> " + config.customImagePath);
+            return;
+        }
+
+        // 1. Обучаем сеть (обязательно, чтобы сформировать веса)
+        NetworkSetup setup = setupNetwork(config);
+        System.out.println("Сеть обучена. Обработка пользовательского изображения...");
+
+        // 2. Загружаем пользовательское изображение
+        BufferedImage rawImg = ImageIO.read(imgFile);
+
+        // 3. Масштабируем его под размер сети (важный момент!)
+        // Сеть ожидает массив определенной длины, поэтому ресайзим под setup.width/height
+        BufferedImage resizedImg = ImageUtils.resize(rawImg, setup.width, setup.height);
+
+        float[] originalPattern = ImageUtils.imageToPattern(resizedImg);
+
+        // 4. Добавляем шум (если пользователь задал -n)
+        float[] noisyPattern = ImageUtils.addNoise(originalPattern, config.noiseLevel, config.invertNoise);
+
+        // 5. Восстанавливаем
+        HopfieldNetwork.RecallResult result = setup.network.recall(noisyPattern, Integer.MAX_VALUE, config.recallTolerance);
+
+        // 6. Сохраняем результат
+        List<BufferedImage> images = new ArrayList<>();
+        images.add(ImageUtils.patternToImage(originalPattern, setup.width, setup.height));
+        images.add(ImageUtils.patternToImage(noisyPattern, setup.width, setup.height));
+        images.add(ImageUtils.patternToImage(result.state(), setup.width, setup.height));
+
+        BufferedImage combined = ImageUtils.combineImagesHorizontal(images);
+        String outName = "custom_out.png";
+        ImageIO.write(combined, "png", new File(outName));
+
+        System.out.println("Результат обработки сохранен в файл: " + outName);
+        System.out.println("(Слева: Ваше фото (сжатое), Центр: С шумом, Справа: Ответ сети)");
     }
 
     private static void runSingleLetter(AppConfig config) throws IOException {
@@ -79,7 +118,7 @@ public class Main {
 
         int patternIndex = Character.toUpperCase(config.singleLetter) - 'A';
         if (patternIndex < 0 || patternIndex >= setup.patterns.size()) {
-            System.err.println("Индекс буквы выходит за пределы (нет файла для " + config.singleLetter + ")");
+            System.err.println("Индекс буквы выходит за пределы");
             return;
         }
 
@@ -109,7 +148,6 @@ public class Main {
         for (int i = 0; i < setup.patterns.size(); i++) {
             float[] original = setup.patterns.get(i);
             float[] noisy = ImageUtils.addNoise(original, config.noiseLevel, config.invertNoise);
-
             HopfieldNetwork.RecallResult result = setup.network.recall(noisy, Integer.MAX_VALUE, config.recallTolerance);
 
             int w = 40, h = 40;
@@ -120,28 +158,19 @@ public class Main {
             if (checkSimilarity(original, result.state(), config.invertNoise)) {
                 successCount++;
             } else {
-                System.out.println("Паттерн " + i + " не удалось восстановить.");
                 failedIndices.add(i);
             }
         }
-
         System.out.printf("Успешно восстановлено %d/%d образов (%.2f%%)%n",
                 successCount, setup.patterns.size(), 100.0 * successCount / setup.patterns.size());
-
-        if (!failedIndices.isEmpty()) {
-            System.out.println("Индексы неудач: " + failedIndices);
-        }
     }
 
     private static boolean checkSimilarity(float[] original, float[] recalled, boolean inverted) {
         float[] normOrg = normalize(original);
         float[] normRec = normalize(recalled);
-
         for (int i = 0; i < normOrg.length; i++) {
             float target = inverted ? -normOrg[i] : normOrg[i];
-            if (Math.abs(normRec[i] - target) > 1e-5) {
-                return false;
-            }
+            if (Math.abs(normRec[i] - target) > 1e-5) return false;
         }
         return true;
     }
