@@ -39,7 +39,7 @@ public class Main {
         int hiddenSize = 15;
         int contextSize = 5;
         int effectorSize = 2;
-        double alpha = 0.00008;
+        double alpha = 0.000008;
         double hiddenAlpha = 0.01;
         double maxError = 1e-5;
         int maxIters = 500000; // Уменьшил дефолт для Java, чтобы быстрее запускалось
