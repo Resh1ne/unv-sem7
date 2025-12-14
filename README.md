@@ -37,7 +37,7 @@ java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main [АРГУМ
 | `--win-len`      | `2`                   | Размер скользящего окна (количество входов).                             |
 | `--hidden`       | `15`                  | Количество нейронов в скрытом слое.                                      |
 | `--con-len`      | `5`                   | Размер контекстного слоя (памяти).                                       |
-| `--eff-len`      | `2`                   | Размер эффекторного слоя (обратная связь от выхода).                     |
+| `--eff-len`      | `3`                   | Размер эффекторного слоя (обратная связь от выхода).                     |
 | `--alpha`        | `0.00008`             | Скорость обучения (Learning Rate).                                       |
 | `--iters`        | `500000`              | Максимальное количество итераций обучения.                               |
 | `--max-error`    | `1e-5`                | Целевая ошибка обучения (MSE).                                           |
@@ -138,45 +138,25 @@ java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main --seq geom 
 ## 🧪 Примеры запуска (Сценарии)
 
 ### 1. Последовательность Фибоначчи (Экспоненциальный рост)
-Для быстрорастущих последовательностей **обязательно** используйте логарифмирование (`--log`) и слегка увеличьте скорость обучения.
 
 ```bash
-java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main \
-  --seq fib \
-  --log \
-  --alpha 0.0001 \
-  --iters 200000
+java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main --seq fib
 ```
 
-### 2. Периодическая последовательность (Сложный паттерн)
-Для последовательностей вида `0, 1, 0, 0, 1...` важно увеличить размер окна (`--win-len`), чтобы сеть видела закономерность целиком.
+### 2.  Степенная функция (Квадраты)
 
 ```bash
-java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main \
-  --seq per2 \
-  --win-len 4 \
-  --hidden 20 \
-  --alpha 0.001 \
-  --max-error 0.00001
+java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main --seq sqr --log --zscore --seq-len 10 --win-len 2 --hidden 8 --con-len 4 --alpha 0.0001 --max-error 2e-5
 ```
 
 ### 3. Натуральные числа (Линейный рост)
-Для простых линейных зависимостей используйте стандартные настройки, но будьте аккуратны с нормализацией (Z-score может мешать экстраполяции далеко за пределы обучающего диапазона).
 
 ```bash
-java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main \
-  --seq nat \
-  --win-len 3 \
-  --alpha 0.00001 \
-  --iters 300000
+java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main --seq nat
 ```
 
-### 4. Геометрическая прогрессия (Убывающая)
-Хорошо работает с Z-score нормализацией.
+### 4. Периодическая  (Период 4 шага)
 
 ```bash
-java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main \
-  --seq geom \
-  --zscore \
-  --alpha 0.0001
+java -cp target/elman-jordan-rnn-1.0-SNAPSHOT.jar by.bsuir.lab3.Main --seq per1
 ```

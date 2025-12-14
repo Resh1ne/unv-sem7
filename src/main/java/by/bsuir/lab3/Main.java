@@ -38,7 +38,7 @@ public class Main {
         int windowSize = 2;
         int hiddenSize = 15;
         int contextSize = 5;
-        int effectorSize = 2;
+        int effectorSize = 3;
         double alpha = 0.00008;
         double hiddenAlpha = 0.01;
         double maxError = 1e-5;
